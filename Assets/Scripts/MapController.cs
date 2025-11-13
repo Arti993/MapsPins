@@ -9,7 +9,7 @@ using System;
 [RequireComponent(typeof(Camera))]
 public class MapController : MonoBehaviour
 {
-   [Header("References")]
+    [Header("References")]
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Image mapImage;
     
@@ -45,7 +45,7 @@ public class MapController : MonoBehaviour
     private Transform pinContainer; // Контейнер для маркеров (дочерний к карте)
 
     // 📋 СЛОВАРЬ ДАННЫХ МАРКЕРОВ
-    private Dictionary<GameObject, PinMarker.PinData> pinDataDictionary = new Dictionary<GameObject, PinMarker.PinData>();
+    private Dictionary<GameObject, PinData> pinDataDictionary = new Dictionary<GameObject, PinData>();
     
     public float CurrentZoom => zoomSteps[currentZoomIndex];
 
@@ -264,7 +264,7 @@ public class MapController : MonoBehaviour
             pinMarker.SetMapController(this);
             
             // Создаём новые данные для маркера
-            PinMarker.PinData newPinData = new PinMarker.PinData("", "", null, mapLocalPosition);
+            PinData newPinData = new PinData("", "", null, mapLocalPosition);
             pinDataDictionary[pinObject] = newPinData;
             
             // Подписываемся на событие сохранения данных маркера
@@ -582,7 +582,7 @@ public class MapController : MonoBehaviour
     }
     
     // 🆕 ПУБЛИЧНЫЙ МЕТОД: получение всех маркеров и их данных
-    public Dictionary<GameObject, PinMarker.PinData> GetAllPinsData()
+    public Dictionary<GameObject, PinData> GetAllPinsData()
     {
         return pinDataDictionary;
     }
@@ -615,12 +615,24 @@ public class MapController : MonoBehaviour
         }
     }
     
+    // 🆕 ПУБЛИЧНЫЙ МЕТОД: получение контейнера для маркеров
+    public Transform GetPinContainer()
+    {
+        // Убеждаемся, что контейнер существует
+        if (pinContainer == null)
+        {
+            CreatePinContainer();
+        }
+        
+        return pinContainer;
+    }
+    
     // 🆕 ПУБЛИЧНЫЙ МЕТОД: обновление данных маркера
     public void UpdatePinData(GameObject pinObject, string name, string description, Texture2D image)
     {
         if (pinDataDictionary.ContainsKey(pinObject))
         {
-            PinMarker.PinData pinData = pinDataDictionary[pinObject];
+            PinData pinData = pinDataDictionary[pinObject];
             pinData.name = name;
             pinData.description = description;
             pinData.image = image;

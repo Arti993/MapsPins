@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class PanelManager : MonoBehaviour
+public class SinglePanelVision : MonoBehaviour
 {
     // Список всех открытых панелей
     private static readonly List<PinMarker> openPanels = new List<PinMarker>();

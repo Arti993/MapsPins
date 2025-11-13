@@ -14,7 +14,7 @@ public class PinPanel : MonoBehaviour
     public Text imageHintText;
     
     private PinMarker pinMarker;
-    private PinMarker.PinData pinData;
+    private PinData pinData;
     private bool isEditMode = true;
     
     private void Awake()
@@ -41,7 +41,7 @@ public class PinPanel : MonoBehaviour
         }
     }
     
-    public void Setup(PinMarker pinMarker, PinMarker.PinData pinData, bool editMode)
+    public void Setup(PinMarker pinMarker, PinData pinData, bool editMode)
     {
         this.pinMarker = pinMarker;
         this.pinData = pinData;
@@ -77,7 +77,7 @@ public class PinPanel : MonoBehaviour
     }
     
     // Обновляет отображение изображения
-    public void RefreshImage(PinMarker.PinData pinData)
+    public void RefreshImage(PinData pinData)
     {
         this.pinData = pinData;
         UpdateImageDisplay();
