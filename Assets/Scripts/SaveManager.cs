@@ -4,20 +4,21 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
+using UnityEngine.Serialization;
 
 public class SaveManager : MonoBehaviour
 {
     [Header("Save Settings")]
-    [SerializeField] private string saveFileName = "map_pins_data.json";
-    [SerializeField] private bool autoSave = true;
-    [SerializeField] private float autoSaveInterval = 30f; // Автосохранение каждые 30 секунд
+    [SerializeField] private string _saveFileName = "map_pins_data.json";
+    [SerializeField] private bool _autoSave = true;
+    [SerializeField] private float _autoSaveInterval = 30f; // Автосохранение каждые 30 секунд
     
     // События для оповещения других компонентов
     public event Action<List<PinData>> OnPinsLoaded;
     public event Action OnPinsSaved;
     
-    private string SavePath => Path.Combine(Application.persistentDataPath, saveFileName);
-    private float lastAutoSaveTime;
+    private string _savePath => Path.Combine(Application.persistentDataPath, _saveFileName);
+    private float _lastAutoSaveTime;
     
     // Синглтон паттерн для удобного доступа
     public static SaveManager Instance { get; private set; }
@@ -37,7 +38,7 @@ public class SaveManager : MonoBehaviour
         }
         
         // Убеждаемся что папка существует
-        string directory = Path.GetDirectoryName(SavePath);
+        string directory = Path.GetDirectoryName(_savePath);
         if (!Directory.Exists(directory))
         {
             Directory.CreateDirectory(directory);
@@ -47,10 +48,10 @@ public class SaveManager : MonoBehaviour
     private void Update()
     {
         // Автосохранение по времени
-        if (autoSave && Time.time - lastAutoSaveTime >= autoSaveInterval)
+        if (_autoSave && Time.time - _lastAutoSaveTime >= _autoSaveInterval)
         {
             SaveAllPins();
-            lastAutoSaveTime = Time.time;
+            _lastAutoSaveTime = Time.time;
         }
     }
     
@@ -92,12 +93,12 @@ public class SaveManager : MonoBehaviour
             string jsonData = JsonConvert.SerializeObject(saveData, Formatting.Indented);
             
             // Записываем в файл
-            File.WriteAllText(SavePath, jsonData);
+            File.WriteAllText(_savePath, jsonData);
             
-            Debug.Log($"Saved {pinsToSave.Count} pins to: {SavePath}");
+            Debug.Log($"Saved {pinsToSave.Count} pins to: {_savePath}");
             OnPinsSaved?.Invoke();
             
-            lastAutoSaveTime = Time.time;
+            _lastAutoSaveTime = Time.time;
         }
         catch (Exception e)
         {
@@ -113,14 +114,14 @@ public class SaveManager : MonoBehaviour
         try
         {
             // Проверяем существование файла
-            if (!File.Exists(SavePath))
+            if (!File.Exists(_savePath))
             {
                 Debug.Log("Save file not found. No pins to load.");
                 return new List<PinData>();
             }
             
             // Читаем и десериализуем JSON
-            string jsonData = File.ReadAllText(SavePath);
+            string jsonData = File.ReadAllText(_savePath);
             MapPinsSaveData saveData = JsonConvert.DeserializeObject<MapPinsSaveData>(jsonData);
             
             if (saveData == null || saveData.pins == null)
@@ -153,7 +154,7 @@ public class SaveManager : MonoBehaviour
     /// </summary>
     public bool SaveFileExists()
     {
-        return File.Exists(SavePath);
+        return File.Exists(_savePath);
     }
     
     /// <summary>
@@ -163,10 +164,10 @@ public class SaveManager : MonoBehaviour
     {
         try
         {
-            if (File.Exists(SavePath))
+            if (File.Exists(_savePath))
             {
-                File.Delete(SavePath);
-                Debug.Log($"Deleted save file: {SavePath}");
+                File.Delete(_savePath);
+                Debug.Log($"Deleted save file: {_savePath}");
             }
         }
         catch (Exception e)
@@ -200,15 +201,15 @@ public class SaveManager : MonoBehaviour
     {
         try
         {
-            if (!File.Exists(SavePath))
+            if (!File.Exists(_savePath))
                 return null;
             
-            FileInfo fileInfo = new FileInfo(SavePath);
-            var saveData = JsonConvert.DeserializeObject<MapPinsSaveData>(File.ReadAllText(SavePath));
+            FileInfo fileInfo = new FileInfo(_savePath);
+            var saveData = JsonConvert.DeserializeObject<MapPinsSaveData>(File.ReadAllText(_savePath));
             
             return new SaveFileInfo
             {
-                filePath = SavePath,
+                filePath = _savePath,
                 fileSize = fileInfo.Length,
                 lastModified = fileInfo.LastWriteTime,
                 pinCount = saveData?.pins?.Count ?? 0,

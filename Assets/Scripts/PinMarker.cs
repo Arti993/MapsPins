@@ -2,29 +2,28 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
-using System.Collections.Generic;
-using UnityEngine.InputSystem;
 using DG.Tweening;
 using Newtonsoft.Json;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(Image))]
 [RequireComponent(typeof(BoxCollider2D))]
 public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEndDragHandler
 {
    [Header("Pin Panel Settings")]
-    [SerializeField] private GameObject pinPanelPrefab; // Префаб панели маркера
-    [SerializeField] private Vector2 panelOffset = new Vector2(150, 0); // Смещение панели от маркера
+    [SerializeField] private GameObject _pinPanelPrefab; // Префаб панели маркера
+    [SerializeField] private Vector2 _panelOffset = new Vector2(300, 0); // Смещение панели от маркера
     
-    private MapController mapController;
-    private RectTransform rectTransform;
-    private Canvas mainCanvas;
+    private MapController _mapController;
+    private RectTransform _rectTransform;
+    private Canvas _mainCanvas;
     
     // Состояние маркера
-    private GameObject currentPinPanel;
-    private bool isEditMode;
+    private GameObject _currentPinPanel;
+    private bool _isEditMode;
     
     // Флаг для отслеживания перетаскивания
-    private bool wasDragged = false;
+    private bool _wasDragged = false;
     
     public PinData PinData {get; private set;}
     
@@ -33,8 +32,8 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
     
     private void Awake()
     {
-        rectTransform = GetComponent<RectTransform>();
-        mainCanvas = GetComponentInParent<Canvas>();
+        _rectTransform = GetComponent<RectTransform>();
+        _mainCanvas = GetComponentInParent<Canvas>();
     }
     
     /// <summary>
@@ -42,14 +41,12 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
     /// </summary>
     /// <param name="data">Данные маркера</param>
     /// <param name="editMode">true для режима редактирования, false для просмотра</param>
-    public void Initialize(PinData data, bool editMode)
+    public void Initialize(PinData data, bool editMode, bool showPanelOnInitialize = true)
     {
         PinData = data;
-        isEditMode = editMode;
+        _isEditMode = editMode;
         
-        // В режиме редактирования панель показывается сразу для настройки
-        // В режиме просмотра панель показывается сразу если есть имя
-        if (editMode || (!editMode && PinData.name != ""))
+        if (showPanelOnInitialize && (editMode || (!editMode && PinData.name != "")))
         {
             ShowPinPanel();
         }
@@ -62,7 +59,7 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
     
     private void ShowPinPanel()
     {
-        if (pinPanelPrefab == null)
+        if (_pinPanelPrefab == null)
         {
             Debug.LogError("PinPanel prefab not assigned!");
             return;
@@ -80,21 +77,21 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
         }
         
         // Создаем панель как дочерний объект Canvas (не карты)
-        currentPinPanel = Instantiate(pinPanelPrefab, mainCanvas.transform);
-        currentPinPanel.name = "PinPanel_" + gameObject.name;
+        _currentPinPanel = Instantiate(_pinPanelPrefab, mainCanvas.transform);
+        _currentPinPanel.name = "PinPanel_" + gameObject.name;
         
         // Получаем компонент PinPanel
-        PinPanel pinPanel = currentPinPanel.GetComponent<PinPanel>();
+        PinPanel pinPanel = _currentPinPanel.GetComponent<PinPanel>();
         if (pinPanel != null)
         {
             // Настраиваем панель
-            pinPanel.Setup(this, PinData, isEditMode);
+            pinPanel.Setup(this, PinData, _isEditMode);
         }
         else
         {
             Debug.LogError("PinPanel component not found on prefab!");
-            Destroy(currentPinPanel);
-            currentPinPanel = null;
+            Destroy(_currentPinPanel);
+            _currentPinPanel = null;
             return;
         }
         
@@ -115,13 +112,13 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
     /// </summary>
     private void AnimatePanelAppearance()
     {
-        if (currentPinPanel == null) return;
+        if (_currentPinPanel == null) return;
         
         // Получаем Canvas Group для анимации прозрачности
-        CanvasGroup canvasGroup = currentPinPanel.GetComponent<CanvasGroup>();
+        CanvasGroup canvasGroup = _currentPinPanel.GetComponent<CanvasGroup>();
         if (canvasGroup == null)
         {
-            canvasGroup = currentPinPanel.AddComponent<CanvasGroup>();
+            canvasGroup = _currentPinPanel.AddComponent<CanvasGroup>();
         }
         
         // Начинаем с прозрачного состояния
@@ -136,17 +133,17 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
     /// </summary>
     private void AnimatePanelDisappearance(System.Action onComplete = null)
     {
-        if (currentPinPanel == null)
+        if (_currentPinPanel == null)
         {
             onComplete?.Invoke();
             return;
         }
         
         // Получаем Canvas Group для анимации прозрачности
-        CanvasGroup canvasGroup = currentPinPanel.GetComponent<CanvasGroup>();
+        CanvasGroup canvasGroup = _currentPinPanel.GetComponent<CanvasGroup>();
         if (canvasGroup == null)
         {
-            canvasGroup = currentPinPanel.AddComponent<CanvasGroup>();
+            canvasGroup = _currentPinPanel.AddComponent<CanvasGroup>();
         }
         
         // Плавно исчезаем
@@ -187,11 +184,11 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
     /// </summary>
     private void PositionPinPanelOnScreen()
     {
-        if (currentPinPanel == null) return;
+        if (_currentPinPanel == null) return;
         
         RectTransform markerRect = GetComponent<RectTransform>();
-        RectTransform panelRect = currentPinPanel.GetComponent<RectTransform>();
-        Canvas canvas = currentPinPanel.GetComponentInParent<Canvas>();
+        RectTransform panelRect = _currentPinPanel.GetComponent<RectTransform>();
+        Canvas canvas = _currentPinPanel.GetComponentInParent<Canvas>();
         
         if (markerRect != null && panelRect != null && canvas != null)
         {
@@ -221,7 +218,7 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
             }
             
             // Размещаем панель с учетом смещения в экранных координатах
-            Vector2 panelScreenPos = markerScreenPos + panelOffset;
+            Vector2 panelScreenPos = markerScreenPos + _panelOffset;
             
             // Устанавливаем позицию панели (работает с любым Canvas mode)
             panelRect.position = new Vector3(panelScreenPos.x, panelScreenPos.y, 0);
@@ -230,23 +227,23 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
     
     private void PositionPinPanel()
     {
-        if (currentPinPanel == null) return;
+        if (_currentPinPanel == null) return;
         
         RectTransform markerRect = GetComponent<RectTransform>();
-        RectTransform panelRect = currentPinPanel.GetComponent<RectTransform>();
+        RectTransform panelRect = _currentPinPanel.GetComponent<RectTransform>();
         
         if (markerRect != null && panelRect != null)
         {
             // Размещаем панель с учетом смещения
             Vector3 markerWorldPos = markerRect.position;
-            panelRect.position = markerWorldPos + new Vector3(panelOffset.x, panelOffset.y, 0);
+            panelRect.position = markerWorldPos + new Vector3(_panelOffset.x, _panelOffset.y, 0);
         }
     }
     
     // Публичный метод для закрытия панели (может вызываться из PinPanel)
     public void ClosePinPanel()
     {
-        if (currentPinPanel != null)
+        if (_currentPinPanel != null)
         {
             // Разрегистрируем панель из PanelManager
             SinglePanelVision.UnregisterOpenPanel(this);
@@ -254,8 +251,8 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
             // Анимируем исчезновение, затем уничтожаем
             AnimatePanelDisappearance(() =>
             {
-                Destroy(currentPinPanel);
-                currentPinPanel = null;
+                Destroy(_currentPinPanel);
+                _currentPinPanel = null;
             });
         }
     }
@@ -290,9 +287,9 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
             Debug.Log($"Pin data updated: name='{PinData.name}', description='{PinData.description}', position={PinData.mapPosition}");
             
             // Обновляем данные в MapController если позиция изменилась
-            if (positionChanged && mapController != null)
+            if (positionChanged && _mapController != null)
             {
-                mapController.UpdatePinPosition(gameObject, PinData.mapPosition);
+                _mapController.UpdatePinPosition(gameObject, PinData.mapPosition);
             }
         }
     }
@@ -300,7 +297,7 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
     // Публичный метод для установки MapController
     public void SetMapController(MapController controller)
     {
-        mapController = controller;
+        _mapController = controller;
         Debug.Log($"MapController set for PinMarker: {gameObject.name}");
     }
     
@@ -314,9 +311,9 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
         OnPinDataSaved?.Invoke(name, description);
         
         // Обновляем данные в MapController для синхронизации
-        if (mapController != null)
+        if (_mapController != null)
         {
-            mapController.UpdatePinData(gameObject, name, description, PinData.image);
+            _mapController.UpdatePinData(gameObject, name, description, PinData.image);
         }
     }
     
@@ -356,9 +353,9 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
             Debug.Log("Demo image loaded for pin (File browser simulation)");
             
             // Обновляем отображение в панели, если она открыта
-            if (currentPinPanel != null)
+            if (_currentPinPanel != null)
             {
-                PinPanel pinPanel = currentPinPanel.GetComponent<PinPanel>();
+                PinPanel pinPanel = _currentPinPanel.GetComponent<PinPanel>();
                 if (pinPanel != null)
                 {
                     pinPanel.RefreshImage(PinData);
@@ -376,7 +373,7 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
     // Публичный метод для проверки, открыта ли панель
     public bool IsPanelOpen()
     {
-        return SinglePanelVision.IsPanelOpen(this) && currentPinPanel != null;
+        return SinglePanelVision.IsPanelOpen(this) && _currentPinPanel != null;
     }
     
     private void OnDestroy()
@@ -385,9 +382,9 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
         SinglePanelVision.UnregisterOpenPanel(this);
         
         // Очистка при уничтожении
-        if (currentPinPanel != null)
+        if (_currentPinPanel != null)
         {
-            Destroy(currentPinPanel);
+            Destroy(_currentPinPanel);
         }
     }
 
@@ -395,14 +392,14 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
     public void OnPointerClick(PointerEventData eventData)
     {
         // Если был выполнен перетаскивание, не открываем панель
-        if (wasDragged)
+        if (_wasDragged)
         {
-            wasDragged = false; // Сбрасываем флаг после обработки
+            _wasDragged = false; // Сбрасываем флаг после обработки
             return;
         }
         
         // Если панель уже открыта, закрываем её
-        if (currentPinPanel != null)
+        if (_currentPinPanel != null)
         {
             ClosePinPanel();
             return;
@@ -415,27 +412,27 @@ public class PinMarker : MonoBehaviour, IPointerClickHandler, IDragHandler, IEnd
     // IDragHandler - обработчик перетаскивания
     public void OnDrag(PointerEventData eventData)
     {
-        wasDragged = true; // Отмечаем, что началось перетаскивание
-        rectTransform.anchoredPosition += eventData.delta / mapController.CurrentZoom / mainCanvas.scaleFactor;
+        _wasDragged = true; // Отмечаем, что началось перетаскивание
+        _rectTransform.anchoredPosition += eventData.delta / _mapController.CurrentZoom / _mainCanvas.scaleFactor;
     }
 
     // IEndDragHandler - обработчик завершения перетаскивания
     public void OnEndDrag(PointerEventData eventData)
     {
-        Debug.Log($"Pin drag ended. Final position: {rectTransform.anchoredPosition}");
+        Debug.Log($"Pin drag ended. Final position: {_rectTransform.anchoredPosition}");
         
         if (PinData != null)
         {
-            PinData.mapPosition = rectTransform.anchoredPosition;
+            PinData.mapPosition = _rectTransform.anchoredPosition;
         }
     
         // Финальное обновление в MapController
-        if (mapController != null)
+        if (_mapController != null)
         {
-            mapController.UpdatePinPosition(gameObject, rectTransform.anchoredPosition);
+            _mapController.UpdatePinPosition(gameObject, _rectTransform.anchoredPosition);
         }
         
         // Сбрасываем флаг перетаскивания после завершения
-        wasDragged = false;
+        _wasDragged = false;
     }
 }

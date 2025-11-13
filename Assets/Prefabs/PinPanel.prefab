@@ -866,13 +866,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89a1f47aa367d3b4e950eb350f034bae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nameInput: {fileID: 3292585199386815009}
-  descriptionInput: {fileID: 5406601089154136369}
-  pinImage: {fileID: 2433379855529859837}
-  saveButton: {fileID: 9151633836674103008}
-  closeButton: {fileID: 0}
-  titleText: {fileID: 0}
-  imageHintText: {fileID: 0}
+  _nameInput: {fileID: 3292585199386815009}
+  _descriptionInput: {fileID: 5406601089154136369}
+  _pinImage: {fileID: 2433379855529859837}
+  _saveButton: {fileID: 9151633836674103008}
+  _closeButton: {fileID: 0}
+  _titleText: {fileID: 0}
+  _imageHintText: {fileID: 0}
 --- !u!1 &5377827689422224674
 GameObject:
   m_ObjectHideFlags: 0

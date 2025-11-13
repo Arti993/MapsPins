@@ -89,8 +89,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 749cc52700d820b42a5c5a39a73eb717, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pinPanelPrefab: {fileID: 5370494793631253420, guid: 1322a461e98fcce4f93f0b7e853a550f, type: 3}
-  panelOffset: {x: 300, y: 0}
+  _pinPanelPrefab: {fileID: 5370494793631253420, guid: 1322a461e98fcce4f93f0b7e853a550f, type: 3}
+  _panelOffset: {x: 300, y: 0}
 --- !u!61 &-9114138492652687114
 BoxCollider2D:
   m_ObjectHideFlags: 0

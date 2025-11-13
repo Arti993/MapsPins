@@ -1,24 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class MapControllerSaveIntegration : MonoBehaviour
 {
     [Header("Auto Loading Settings")]
-    [SerializeField] private bool autoLoadOnStart = true;
-    [SerializeField] private float loadDelay = 1f; // Задержка перед загрузкой для инициализации всех объектов
+    [SerializeField] private bool _autoLoadOnStart = true;
+    [SerializeField] private float _loadDelay = 0f; 
     
+    [FormerlySerializedAs("pinMarkerPrefab")]
     [Header("Pin Creation Settings")]
-    [SerializeField] private GameObject pinMarkerPrefab; // Префаб маркера для создания новых
+    [SerializeField] private GameObject _pinMarkerPrefab; 
     
-    private MapController mapController;
-    private bool isLoadingData = false;
+    private MapController _mapController;
+    private bool _isLoadingData = false;
     
     private void Awake()
     {
-        mapController = GetComponent<MapController>();
+        _mapController = GetComponent<MapController>();
         
-        if (mapController == null)
+        if (_mapController == null)
         {
             Debug.LogError("MapControllerSaveIntegration requires MapController component!");
         }
@@ -33,13 +35,13 @@ public class MapControllerSaveIntegration : MonoBehaviour
         }
         
         // 🔧 Убеждаемся что контейнер маркеров создан
-        if (mapController != null)
+        if (_mapController != null)
         {
-            mapController.GetPinContainer(); // Создает контейнер если его еще нет
+            _mapController.GetPinContainer(); // Создает контейнер если его еще нет
         }
         
         // Автоматически загружаем данные при старте
-        if (autoLoadOnStart)
+        if (_autoLoadOnStart)
         {
             StartCoroutine(AutoLoadPins());
         }
@@ -60,7 +62,7 @@ public class MapControllerSaveIntegration : MonoBehaviour
     private IEnumerator AutoLoadPins()
     {
         // Ждем немного чтобы все объекты успели инициализироваться
-        yield return new WaitForSeconds(loadDelay);
+        yield return new WaitForSeconds(_loadDelay);
         
         if (SaveManager.Instance != null)
         {
@@ -74,13 +76,13 @@ public class MapControllerSaveIntegration : MonoBehaviour
     /// </summary>
     private void CreatePinsFromData(List<PinData> pinDataList)
     {
-        if (isLoadingData) return;
-        isLoadingData = true;
+        if (_isLoadingData) return;
+        _isLoadingData = true;
         
         if (pinDataList == null || pinDataList.Count == 0)
         {
             Debug.Log("No saved pins to load.");
-            isLoadingData = false;
+            _isLoadingData = false;
             return;
         }
         
@@ -95,7 +97,7 @@ public class MapControllerSaveIntegration : MonoBehaviour
         }
         
         Debug.Log("All saved pins loaded successfully.");
-        isLoadingData = false;
+        _isLoadingData = false;
     }
     
     /// <summary>
@@ -103,15 +105,15 @@ public class MapControllerSaveIntegration : MonoBehaviour
     /// </summary>
     private void CreatePinFromData(PinData pinData)
     {
-        if (pinMarkerPrefab == null)
+        if (_pinMarkerPrefab == null)
         {
             Debug.LogError("Pin marker prefab not assigned!");
             return;
         }
         
         // Создаем новый маркер
-        Transform pinContainer = mapController != null ? mapController.GetPinContainer() : transform;
-        GameObject newPinObj = Instantiate(pinMarkerPrefab, pinContainer);
+        Transform pinContainer = _mapController != null ? _mapController.GetPinContainer() : transform;
+        GameObject newPinObj = Instantiate(_pinMarkerPrefab, pinContainer);
         newPinObj.name = $"Pin_{pinData.name}";
         
         // Устанавливаем позицию
@@ -125,8 +127,8 @@ public class MapControllerSaveIntegration : MonoBehaviour
         PinMarker pinMarker = newPinObj.GetComponent<PinMarker>();
         if (pinMarker != null)
         {
-            pinMarker.Initialize(pinData, false); // false = режим просмотра
-            pinMarker.SetMapController(mapController);
+            pinMarker.Initialize(pinData, false, false); 
+            pinMarker.SetMapController(_mapController);
         }
         else
         {

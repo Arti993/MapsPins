@@ -349,18 +349,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fe822bc309601f4394a14b0f7b2781b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainCamera: {fileID: 519420031}
-  mapImage: {fileID: 493819180}
-  pinMarkerPrefab: {fileID: 8004540413054661909, guid: 20c78ed2fe8754643bba0f602e0d3419, type: 3}
-  pinTolerance: 1000
-  cameraScale: {x: 1, y: 1}
-  zoomSteps:
+  _mainCamera: {fileID: 519420031}
+  _mapImage: {fileID: 493819180}
+  _pinMarkerPrefab: {fileID: 8004540413054661909, guid: 20c78ed2fe8754643bba0f602e0d3419, type: 3}
+  _pinTolerance: 10
+  _cameraScale: {x: 1, y: 1}
+  _zoomSteps:
   - 1
   - 1.5
   - 2
   - 3
-  currentZoomIndex: 0
-  dragMultiplier: 1
+  _dragMultiplier: 1
 --- !u!114 &519420034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -373,9 +372,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f509ba1b00148d542824b37c52d71f4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  autoLoadOnStart: 1
-  loadDelay: 1
-  pinMarkerPrefab: {fileID: 8004540413054661909, guid: 20c78ed2fe8754643bba0f602e0d3419, type: 3}
+  _autoLoadOnStart: 1
+  _loadDelay: 0
+  _pinMarkerPrefab: {fileID: 8004540413054661909, guid: 20c78ed2fe8754643bba0f602e0d3419, type: 3}
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -555,9 +554,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef54de476deb5d84b8a1440d18e0bb13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  saveFileName: map_pins_data.json
-  autoSave: 1
-  autoSaveInterval: 30
+  _saveFileName: map_pins_data.json
+  _autoSave: 1
+  _autoSaveInterval: 30
 --- !u!4 &1381328557
 Transform:
   m_ObjectHideFlags: 0

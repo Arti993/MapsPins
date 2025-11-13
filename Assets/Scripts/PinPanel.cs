@@ -1,41 +1,42 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class PinPanel : MonoBehaviour
 {
-   [Header("UI Elements")]
-    public TMP_InputField nameInput;
-    public TMP_InputField descriptionInput;
-    public Image pinImage;
-    public Button saveButton;
-    public Button closeButton;
-    public Text titleText;
-    public Text imageHintText;
+    [Header("UI Elements")]
+    [SerializeField] TMP_InputField _nameInput;
+    [SerializeField]private TMP_InputField _descriptionInput;
+    [SerializeField]private Image _pinImage;
+    [SerializeField]private Button _saveButton;
+    [SerializeField]private Button _closeButton;
+    [SerializeField]private Text _titleText;
+    [SerializeField]private Text _imageHintText;
     
-    private PinMarker pinMarker;
-    private PinData pinData;
-    private bool isEditMode = true;
+    private PinMarker _pinMarker;
+    private PinData _pinData;
+    private bool _isEditMode = true;
     
     private void Awake()
     {
         // Настраиваем обработчики событий
-        if (saveButton != null)
+        if (_saveButton != null)
         {
-            saveButton.onClick.AddListener(OnSaveClicked);
+            _saveButton.onClick.AddListener(OnSaveClicked);
         }
         
-        if (closeButton != null)
+        if (_closeButton != null)
         {
-            closeButton.onClick.AddListener(OnCloseClicked);
+            _closeButton.onClick.AddListener(OnCloseClicked);
         }
         
-        if (pinImage != null && isEditMode)
+        if (_pinImage != null && _isEditMode)
         {
-            Button imageButton = pinImage.GetComponent<Button>();
+            Button imageButton = _pinImage.GetComponent<Button>();
             if (imageButton == null)
             {
-                imageButton = pinImage.gameObject.AddComponent<Button>();
+                imageButton = _pinImage.gameObject.AddComponent<Button>();
             }
             imageButton.onClick.AddListener(OnImageClicked);
         }
@@ -43,67 +44,66 @@ public class PinPanel : MonoBehaviour
     
     public void Setup(PinMarker pinMarker, PinData pinData, bool editMode)
     {
-        this.pinMarker = pinMarker;
-        this.pinData = pinData;
-        this.isEditMode = editMode;
+        _pinMarker = pinMarker;
+        _pinData = pinData;
+        _isEditMode = editMode;
         
-        // Обновляем заголовок
-        if (titleText != null)
+        if (_titleText != null)
         {
-            titleText.text = editMode ? "Новый маркер" : "Маркер";
+            _titleText.text = editMode ? "Новый маркер" : "Маркер";
         }
         
         // Настраиваем интерактивность
-        if (nameInput != null)
+        if (_nameInput != null)
         {
-            nameInput.interactable = editMode;
-            nameInput.text = pinData.name;
+            _nameInput.interactable = editMode;
+            _nameInput.text = pinData.name;
         }
         
-        if (descriptionInput != null)
+        if (_descriptionInput != null)
         {
-            descriptionInput.interactable = editMode;
-            descriptionInput.text = pinData.description;
+            _descriptionInput.interactable = editMode;
+            _descriptionInput.text = pinData.description;
         }
         
         // Настраиваем изображение
         UpdateImageDisplay();
         
         // Показываем/скрываем кнопку сохранения
-        if (saveButton != null)
+        if (_saveButton != null)
         {
-            saveButton.gameObject.SetActive(editMode);
+            _saveButton.gameObject.SetActive(editMode);
         }
     }
     
     // Обновляет отображение изображения
     public void RefreshImage(PinData pinData)
     {
-        this.pinData = pinData;
+        this._pinData = pinData;
         UpdateImageDisplay();
     }
     
     private void UpdateImageDisplay()
     {
-        if (pinImage != null)
+        if (_pinImage != null)
         {
-            if (pinData.image != null)
+            if (_pinData.image != null)
             {
-                Sprite sprite = Sprite.Create(pinData.image, new Rect(0, 0, pinData.image.width, pinData.image.height), new Vector2(0.5f, 0.5f));
-                pinImage.sprite = sprite;
-                pinImage.color = Color.white;
-                if (imageHintText != null)
+                Sprite sprite = Sprite.Create(_pinData.image, new Rect(0, 0, _pinData.image.width, _pinData.image.height), new Vector2(0.5f, 0.5f));
+                _pinImage.sprite = sprite;
+                _pinImage.color = Color.white;
+                if (_imageHintText != null)
                 {
-                    imageHintText.text = "Изображение загружено";
+                    _imageHintText.text = "Изображение загружено";
                 }
             }
             else
             {
-                pinImage.sprite = null;
-                pinImage.color = Color.gray;
-                if (imageHintText != null)
+                _pinImage.sprite = null;
+                _pinImage.color = Color.gray;
+                if (_imageHintText != null)
                 {
-                    imageHintText.text = isEditMode ? "Кликните для выбора изображения" : "Изображение отсутствует";
+                    _imageHintText.text = _isEditMode ? "Кликните для выбора изображения" : "Изображение отсутствует";
                 }
             }
         }
@@ -111,33 +111,33 @@ public class PinPanel : MonoBehaviour
     
     private void OnSaveClicked()
     {
-        if (pinMarker != null && pinData != null && isEditMode)
+        if (_pinMarker != null && _pinData != null && _isEditMode)
         {
             // Получаем данные из полей ввода
-            string name = nameInput != null ? nameInput.text : "";
-            string description = descriptionInput != null ? descriptionInput.text : "";
+            string name = _nameInput != null ? _nameInput.text : "";
+            string description = _descriptionInput != null ? _descriptionInput.text : "";
             
             // Сохраняем данные через PinMarker (это вызовет событие)
-            pinMarker.SavePinData(name, description);
+            _pinMarker.SavePinData(name, description);
             
             // Закрываем панель через PinMarker
-            pinMarker.ClosePinPanel();
+            _pinMarker.ClosePinPanel();
         }
     }
     
     private void OnCloseClicked()
     {
-        if (pinMarker != null)
+        if (_pinMarker != null)
         {
-            pinMarker.ClosePinPanel();
+            _pinMarker.ClosePinPanel();
         }
     }
     
     private void OnImageClicked()
     {
-        if (pinMarker != null && isEditMode)
+        if (_pinMarker != null && _isEditMode)
         {
-            pinMarker.LoadPinImage();
+            _pinMarker.LoadPinImage();
         }
     }
 }

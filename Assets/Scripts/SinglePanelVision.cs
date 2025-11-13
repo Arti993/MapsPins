@@ -5,21 +5,21 @@ using System.Collections.Generic;
 public class SinglePanelVision : MonoBehaviour
 {
     // Список всех открытых панелей
-    private static readonly List<PinMarker> openPanels = new List<PinMarker>();
+    private static readonly List<PinMarker> _openPanels = new List<PinMarker>();
     
     /// <summary>
     /// Закрывает все открытые панели
     /// </summary>
     public static void CloseAllOpenPanels()
     {
-        foreach (PinMarker pinMarker in openPanels.ToArray())
+        foreach (PinMarker pinMarker in _openPanels.ToArray())
         {
             if (pinMarker != null)
             {
                 pinMarker.ClosePinPanel();
             }
         }
-        openPanels.Clear();
+        _openPanels.Clear();
     }
     
     /// <summary>
@@ -28,9 +28,9 @@ public class SinglePanelVision : MonoBehaviour
     /// <param name="pinMarker">Ссылка на маркер с открытой панелью</param>
     public static void RegisterOpenPanel(PinMarker pinMarker)
     {
-        if (pinMarker != null && !openPanels.Contains(pinMarker))
+        if (pinMarker != null && !_openPanels.Contains(pinMarker))
         {
-            openPanels.Add(pinMarker);
+            _openPanels.Add(pinMarker);
         }
     }
     
@@ -40,9 +40,9 @@ public class SinglePanelVision : MonoBehaviour
     /// <param name="pinMarker">Ссылка на маркер с закрытой панелью</param>
     public static void UnregisterOpenPanel(PinMarker pinMarker)
     {
-        if (openPanels.Contains(pinMarker))
+        if (_openPanels.Contains(pinMarker))
         {
-            openPanels.Remove(pinMarker);
+            _openPanels.Remove(pinMarker);
         }
     }
     
@@ -53,7 +53,7 @@ public class SinglePanelVision : MonoBehaviour
     /// <returns>true если панель открыта</returns>
     public static bool IsPanelOpen(PinMarker pinMarker)
     {
-        return openPanels.Contains(pinMarker);
+        return _openPanels.Contains(pinMarker);
     }
     
     /// <summary>
@@ -62,7 +62,7 @@ public class SinglePanelVision : MonoBehaviour
     /// <param name="pinMarker">Маркер для закрытия панели</param>
     public static void ClosePanel(PinMarker pinMarker)
     {
-        if (pinMarker != null && openPanels.Contains(pinMarker))
+        if (pinMarker != null && _openPanels.Contains(pinMarker))
         {
             pinMarker.ClosePinPanel();
             UnregisterOpenPanel(pinMarker);
@@ -75,7 +75,7 @@ public class SinglePanelVision : MonoBehaviour
     /// <returns>Количество открытых панелей</returns>
     public static int GetOpenPanelCount()
     {
-        return openPanels.Count;
+        return _openPanels.Count;
     }
     
     /// <summary>
@@ -83,14 +83,14 @@ public class SinglePanelVision : MonoBehaviour
     /// </summary>
     public static void ClearAllPanels()
     {
-        foreach (PinMarker pinMarker in openPanels.ToArray())
+        foreach (PinMarker pinMarker in _openPanels.ToArray())
         {
             if (pinMarker != null)
             {
                 pinMarker.ClosePinPanel();
             }
         }
-        openPanels.Clear();
+        _openPanels.Clear();
     }
     
     private void OnDestroy()
